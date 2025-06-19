@@ -1,19 +1,19 @@
 package com.modsen.user_service.controller;
 
 
-import com.modsen.user_service.dto.AuthRequest;
-import com.modsen.user_service.dto.AuthResponse;
-import com.modsen.user_service.dto.RegisterRequest;
+import com.modsen.user_service.dto.AuthRequestDto;
+import com.modsen.user_service.dto.AuthResponseDto;
+import com.modsen.user_service.dto.RegisterResponseDto;
+import com.modsen.user_service.dto.RegisterRequestDto;
 import com.modsen.user_service.entity.User;
 import com.modsen.user_service.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,26 +21,30 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService service;
-    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponseDto> registerUser(@Valid @RequestBody RegisterRequestDto request) {
         User savedUser = service.saveUser(request);
-        AuthResponse response = new AuthResponse("User registered successfully", savedUser.getId());
+        RegisterResponseDto response = new RegisterResponseDto("User registered successfully", savedUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/token")
-    public ResponseEntity<String> authenticate(@Valid @RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.email(), authRequest.password())
-        );
-        if (authentication.isAuthenticated()) {
-            String token = service.generateToken(authRequest.email());
-            return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<AuthResponseDto> authenticate(@Valid @RequestBody AuthRequestDto authRequestDto) {
+        AuthResponseDto token = service.authenticateAndGenerateToken(authRequestDto);
+        return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponseDto> refreshToken(@RequestParam UUID refreshToken) {
+        AuthResponseDto response = service.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> revokeToken(@RequestParam UUID refreshToken) {
+        service.revokeRefreshToken(refreshToken);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/validate")

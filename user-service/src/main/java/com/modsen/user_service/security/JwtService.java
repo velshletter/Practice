@@ -1,13 +1,14 @@
-package com.modsen.user_service.service;
+package com.modsen.user_service.security;
 
-import io.jsonwebtoken.JwtException;
+import com.modsen.user_service.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,30 +19,30 @@ public class JwtService {
 
     @Value("${jwt.secret}")
     private String secret;
+    @Value("${jwt.access-token-ttl}")
+    private Duration accessTokenTtl;
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSignKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+    public void validateToken(String token) {
+        Jwts.parser()
+                .verifyWith(getSignKey())
+                .build()
+                .parseSignedClaims(token);
     }
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, email);
+        claims.put("role", user.getRole().name());
+        return createToken(claims, user.getEmail());
     }
 
     public String createToken(Map<String, Object> claims, String email) {
+        Instant now = Instant.now();
+        Instant expiry = now.plus(accessTokenTtl);
         return Jwts.builder()
                 .claims(claims)
                 .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiry))
                 .signWith(getSignKey(), Jwts.SIG.HS256)
                 .compact();
     }
