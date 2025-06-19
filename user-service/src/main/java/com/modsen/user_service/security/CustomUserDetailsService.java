@@ -1,4 +1,4 @@
-package com.modsen.user_service.config;
+package com.modsen.user_service.security;
 
 
 import com.modsen.user_service.entity.User;
