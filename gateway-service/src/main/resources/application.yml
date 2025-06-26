@@ -1,0 +1,53 @@
+server:
+  servlet:
+    context-path: /
+  port:
+    8080
+
+
+spring:
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 20000
+            response-timeout: 7s
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+              - Path=/users/**,/auth/**,/admin/**,/user-service/v3/api-docs
+
+            - id: poll-service
+              uri: lb://poll-service
+              predicates:
+                - Path=/polls/**,/poll-service/v3/api-docs
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - url: /user-service/v3/api-docs
+        name: User Service
+      - url: /poll-service/v3/api-docs
+        name: Poll Service
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    com.modsen.gateway_service: DEBUG
+    com.modsen.poll_service: DEBUG
