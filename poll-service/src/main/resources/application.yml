@@ -1,0 +1,41 @@
+server:
+  port: 8082
+
+openapi:
+  service:
+    title: poll-service doc
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /poll-service/v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: poll-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/polls_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    com.modsen.poll_service: DEBUG
