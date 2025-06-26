@@ -20,9 +20,9 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -35,11 +35,11 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         final String jwtToken = authHeader.substring(7);
-        final String email = jwtService.extractEmail(jwtToken);
+        final String email = jwtUtil.extractEmail(jwtToken);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            jwtService.validateToken(jwtToken);
+            jwtUtil.validateToken(jwtToken);
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,

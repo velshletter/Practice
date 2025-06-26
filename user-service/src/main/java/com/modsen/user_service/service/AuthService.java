@@ -8,7 +8,7 @@ import com.modsen.user_service.entity.User;
 import com.modsen.user_service.repository.RefreshTokenRepository;
 import com.modsen.user_service.repository.UserRepository;
 import com.modsen.user_service.security.CustomUserDetails;
-import com.modsen.user_service.security.JwtService;
+import com.modsen.user_service.security.JwtUtil;
 import com.modsen.user_service.util.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
     @Transactional
@@ -63,7 +63,7 @@ public class AuthService {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.user();
-        String accessToken = jwtService.generateToken(user);
+        String accessToken = jwtUtil.generateToken(user);
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
@@ -77,7 +77,7 @@ public class AuthService {
         final var refreshTokenEntity = refreshTokenRepository.findByIdAndExpiresAtAfter(refreshToken, Instant.now())
                 .orElseThrow(() -> new BadCredentialsException("Invalid or expired refresh token"));
 
-        final var newAccessToken = jwtService.generateToken(refreshTokenEntity.getUser());
+        final var newAccessToken = jwtUtil.generateToken(refreshTokenEntity.getUser());
         return new AuthResponseDto(newAccessToken, refreshToken);
     }
 
@@ -86,7 +86,7 @@ public class AuthService {
     }
 
     public void validateToken(String token) {
-        jwtService.validateToken(token);
+        jwtUtil.validateToken(token);
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JwtService {
+public class JwtUtil {
 
 
     @Value("${jwt.secret}")
@@ -32,6 +32,7 @@ public class JwtService {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
+        claims.put("user_id", user.getId());
         return createToken(claims, user.getEmail());
     }
 
