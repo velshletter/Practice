@@ -5,10 +5,11 @@ import com.modsen.poll_service.dto.OptionResponseDto;
 import com.modsen.poll_service.dto.mapper.OptionMapper;
 import com.modsen.poll_service.entity.Option;
 import com.modsen.poll_service.entity.Poll;
+import com.modsen.poll_service.exception.OptionNotFoundException;
+import com.modsen.poll_service.exception.PollNotFoundException;
 import com.modsen.poll_service.repository.OptionRepository;
 import com.modsen.poll_service.repository.PollRepository;
 import com.modsen.poll_service.service.OptionService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public OptionResponseDto addOption(UUID pollId, OptionRequestDto dto) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new EntityNotFoundException("Poll not found"));
+                .orElseThrow(() -> new PollNotFoundException("Poll not found"));
 
         Option option = optionMapper.toEntity(dto);
         option.setPoll(poll);
@@ -39,7 +40,7 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public void deleteOption(UUID optionId) {
         Option option = optionRepository.findById(optionId)
-                .orElseThrow(() -> new EntityNotFoundException("Option not found"));
+                .orElseThrow(() -> new OptionNotFoundException("Option not found"));
         optionRepository.delete(option);
     }
 
@@ -48,3 +49,4 @@ public class OptionServiceImpl implements OptionService {
         return optionMapper.toDtoList(optionRepository.findByPollId(pollId));
     }
 }
+

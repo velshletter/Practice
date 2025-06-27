@@ -3,11 +3,14 @@ package com.modsen.poll_service.service.impl;
 import com.modsen.poll_service.entity.Option;
 import com.modsen.poll_service.entity.Poll;
 import com.modsen.poll_service.entity.Vote;
+import com.modsen.poll_service.exception.OptionMismatchException;
+import com.modsen.poll_service.exception.PollNotActiveException;
+import com.modsen.poll_service.exception.PollNotFoundException;
+import com.modsen.poll_service.exception.UserAlreadyVotedException;
 import com.modsen.poll_service.repository.OptionRepository;
 import com.modsen.poll_service.repository.PollRepository;
 import com.modsen.poll_service.repository.VoteRepository;
 import com.modsen.poll_service.service.VoteService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +31,19 @@ public class VoteServiceImpl implements VoteService {
     @Override
     public void castVote(UUID pollId, UUID optionId, UUID userId, String ipAddress) {
         if (voteRepository.existsByPollIdAndUserId(pollId, userId)) {
-            throw new IllegalStateException("User has already voted in this poll");
+            throw new UserAlreadyVotedException("User has already voted in this poll");
         }
 
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new EntityNotFoundException("Poll not found"));
+                .orElseThrow(() -> new PollNotFoundException("Poll not found"));
 
         if (Instant.now().isBefore(poll.getStartDate()) || Instant.now().isAfter(poll.getEndDate())) {
-            throw new IllegalStateException("Poll is not active");
+            throw new PollNotActiveException("Poll is not active");
         }
 
         Option option = optionRepository.findById(optionId)
                 .filter(o -> o.getPoll().getId().equals(pollId))
-                .orElseThrow(() -> new IllegalArgumentException("Option does not belong to the specified poll"));
+                .orElseThrow(() -> new OptionMismatchException("Option does not belong to the specified poll"));
 
         Vote vote = Vote.builder()
                 .poll(poll)
