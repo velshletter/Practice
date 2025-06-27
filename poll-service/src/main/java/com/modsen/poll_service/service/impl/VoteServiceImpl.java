@@ -1,5 +1,7 @@
 package com.modsen.poll_service.service.impl;
 
+import com.modsen.poll_service.dto.VoteResponseDto;
+import com.modsen.poll_service.dto.mapper.VoteMapper;
 import com.modsen.poll_service.entity.Option;
 import com.modsen.poll_service.entity.Poll;
 import com.modsen.poll_service.entity.Vote;
@@ -27,6 +29,7 @@ public class VoteServiceImpl implements VoteService {
     private final VoteRepository voteRepository;
     private final PollRepository pollRepository;
     private final OptionRepository optionRepository;
+    private final VoteMapper voteMapper;
 
     @Override
     public void castVote(UUID pollId, UUID optionId, UUID userId, String ipAddress) {
@@ -63,8 +66,11 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Vote> getVotesForPoll(UUID pollId) {
-        return voteRepository.findAllByPollId(pollId);
+    public List<VoteResponseDto> getVotesForPoll(UUID pollId) {
+        List<Vote> votes = voteRepository.findAllByPollId(pollId);
+        return votes.stream()
+                .map(voteMapper::toDto)
+                .toList();
     }
 
     @Override

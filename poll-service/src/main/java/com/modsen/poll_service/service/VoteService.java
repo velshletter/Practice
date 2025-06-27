@@ -1,6 +1,6 @@
 package com.modsen.poll_service.service;
 
-import com.modsen.poll_service.entity.Vote;
+import com.modsen.poll_service.dto.VoteResponseDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +11,7 @@ public interface VoteService {
 
     boolean hasUserVoted(UUID pollId, UUID userId);
 
-    List<Vote> getVotesForPoll(UUID pollId);
+    List<VoteResponseDto> getVotesForPoll(UUID pollId);
 
     long getVoteCountForOption(UUID pollId, UUID optionId);
 }

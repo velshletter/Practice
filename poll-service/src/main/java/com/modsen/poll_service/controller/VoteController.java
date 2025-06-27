@@ -1,6 +1,6 @@
 package com.modsen.poll_service.controller;
 
-import com.modsen.poll_service.entity.Vote;
+import com.modsen.poll_service.dto.VoteResponseDto;
 import com.modsen.poll_service.service.VoteService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class VoteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Vote>> getAllVotesForPoll(@PathVariable UUID pollId) {
+    public ResponseEntity<List<VoteResponseDto>> getAllVotesForPoll(@PathVariable UUID pollId) {
         return ResponseEntity.ok(voteService.getVotesForPoll(pollId));
     }
 
