@@ -13,7 +13,8 @@ public class RouterValidator {
     private static final List<String> openApiEndpoints = List.of(
             "/auth/**",
             "/user-service/v3/api-docs",
-            "/poll-service/v3/api-docs"
+            "/poll-service/v3/api-docs",
+            "/analytics-service/v3/api-docs"
     );
 
     private final PathPatternParser parser = new PathPatternParser();

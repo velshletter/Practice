@@ -1,15 +1,15 @@
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${SERVER_PORT:8081}
 
 openapi:
   service:
-    title: user-service doc
+    title: analytics-service doc
     version: 1.0.0
     url: http://localhost:8080
 
 springdoc:
   api-docs:
-    path: /user-service/v3/api-docs
+    path: /analytics-service/v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
 
@@ -20,12 +20,21 @@ eureka:
 
 spring:
   application:
-    name: user-service
+    name: analytics-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/polls_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: poll-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,10 +44,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-jwt:
-  secret: ${JWT_SECRET:example_jwt_secret}
-  access-token-ttl: 1h
-  refresh-token-ttl: 1d
 logging:
-    level:
-      org.springframework.security: DEBUG
+  level:
+    com.modsen.analytics_service: DEBUG

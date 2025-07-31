@@ -1,13 +1,13 @@
-package com.modsen.result_service;
+package com.modsen.analytics_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ResultServiceApplication {
+public class AnalyticsServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ResultServiceApplication.class, args);
+		SpringApplication.run(AnalyticsServiceApplication.class, args);
 	}
 
 }

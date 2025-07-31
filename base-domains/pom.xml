@@ -10,14 +10,16 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>eureka-server</artifactId>
-    <name>Eureka Server</name>
-    <description>Eureka discovery server</description>
+    <artifactId>base-domains</artifactId>
+    <name>Base Domains</name>
+    <description>Shared DTOs and event classes for microservices</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- Test dependencies -->
         <dependency>
@@ -30,19 +32,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.modsen.eureka_server.EurekaServerApplication</mainClass>
-                    <layout>JAR</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

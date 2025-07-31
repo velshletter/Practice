@@ -24,6 +24,10 @@ public class GatewayConfig {
                         .path("/polls/**", "/poll-service/v3/api-docs")
                         .filters(f -> f.filter(jwtAuthFilter))
                         .uri("lb://poll-service"))
+                .route("analytics-service", r -> r
+                        .path("/results/**", "/analytics-service/v3/api-docs")
+                        .filters(f -> f.filter(jwtAuthFilter))
+                        .uri("lb://analytics-service"))
                 .build();
     }
 }

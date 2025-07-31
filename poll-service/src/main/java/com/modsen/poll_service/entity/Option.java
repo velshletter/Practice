@@ -3,6 +3,8 @@ package com.modsen.poll_service.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,4 +29,8 @@ public class Option {
 
     @Column(name = "option_order", nullable = false)
     private Integer order;
+
+    @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
+
 }

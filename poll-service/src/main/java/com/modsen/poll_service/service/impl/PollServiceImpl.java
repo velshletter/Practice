@@ -7,6 +7,7 @@ import com.modsen.poll_service.entity.Poll;
 import com.modsen.poll_service.exception.PollNotFoundException;
 import com.modsen.poll_service.repository.PollRepository;
 import com.modsen.poll_service.repository.VoteRepository;
+import com.modsen.poll_service.service.PollClosingService;
 import com.modsen.poll_service.service.PollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final VoteRepository voteRepository;
     private final PollMapper pollMapper;
+    private final PollClosingService pollClosingService;
 
     @Override
     public List<PollResponseDto> getPolls() {
@@ -88,14 +90,19 @@ public class PollServiceImpl implements PollService {
     @Transactional
     public void finishPoll(UUID pollId) {
         Poll poll = findPollOrThrow(pollId);
-        pollRepository.save(poll);
+
+        poll.setEndDate(Instant.now());
+
+        pollClosingService.closePoll(poll);
     }
 
     @Override
     public boolean hasUserVoted(UUID pollId, UUID userId) {
         return voteRepository.existsByPollIdAndUserId(pollId, userId);
     }
-    
+
+
+
     private Poll findPollOrThrow(UUID pollId) {
         return pollRepository.findById(pollId)
                 .orElseThrow(() -> new PollNotFoundException("Poll not found with id: " + pollId));

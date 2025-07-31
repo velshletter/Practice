@@ -1,8 +1,7 @@
 server:
   servlet:
     context-path: /
-  port:
-    8080
+  port: ${SERVER_PORT:8080}
 
 
 spring:
@@ -26,6 +25,12 @@ spring:
               predicates:
                 - Path=/polls/**,/poll-service/v3/api-docs
 
+            - id: analytics-service
+              uri: lb://analytics-service
+              predicates:
+                - Path=/results/**,/analytics-service/v3/api-docs
+
+
 
 springdoc:
   swagger-ui:
@@ -35,19 +40,18 @@ springdoc:
         name: User Service
       - url: /poll-service/v3/api-docs
         name: Poll Service
+      - url: /analytics-service/v3/api-docs
+        name: Analytics Service
 
 
 eureka:
   client:
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    hostname: localhost
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka/}
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:example_jwt_secret}
 
 logging:
   level:
     com.modsen.gateway_service: DEBUG
-    com.modsen.poll_service: DEBUG

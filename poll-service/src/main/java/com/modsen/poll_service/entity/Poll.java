@@ -26,11 +26,13 @@ public class Poll {
 
     private String description;
 
+    @Builder.Default
     @Column(name = "is_anonymous", nullable = false)
-    private boolean isAnonymous;
+    private boolean isAnonymous = false;
 
+    @Builder.Default
     @Column(name = "is_multiple_choice", nullable = false)
-    private boolean isMultipleChoice;
+    private boolean isMultipleChoice = false;
 
     @Column(name = "start_date", nullable = false)
     private Instant startDate;
@@ -45,11 +47,13 @@ public class Poll {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "poll_tags", joinColumns = @JoinColumn(name = "poll_id"))
     @Column(name = "tag")
     private Set<String> tags = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Option> options = new ArrayList<>();
 
