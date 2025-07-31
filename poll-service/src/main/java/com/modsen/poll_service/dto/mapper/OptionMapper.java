@@ -5,11 +5,10 @@ import com.modsen.poll_service.dto.OptionResponseDto;
 import com.modsen.poll_service.entity.Option;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = "spring")
 public interface OptionMapper {
 
     @Mapping(source = "poll.id", target = "pollId")
@@ -17,6 +16,9 @@ public interface OptionMapper {
 
     List<OptionResponseDto> toDtoList(List<Option> options);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "poll", ignore = true)
+    @Mapping(target = "votes", ignore = true)
     Option toEntity(OptionRequestDto dto);
 }
 

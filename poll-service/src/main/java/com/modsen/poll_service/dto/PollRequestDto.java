@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Builder
@@ -36,6 +35,4 @@ public class PollRequestDto {
 
     private List<String> tags;
 
-    @NotNull
-    private UUID createdBy;
 }
