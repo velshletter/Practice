@@ -71,6 +71,11 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${common.csv.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.modsen</groupId>
             <artifactId>base-domains</artifactId>
             <version>1.0-SNAPSHOT</version>
