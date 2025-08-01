@@ -35,6 +35,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <postgresql.version>42.7.6</postgresql.version>
         <guava.version>33.4.8-jre</guava.version>
+        <common.csv.version>1.14.1</common.csv.version>
     </properties>
 
     <dependencyManagement>
