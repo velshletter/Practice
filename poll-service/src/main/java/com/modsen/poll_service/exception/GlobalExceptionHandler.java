@@ -1,5 +1,6 @@
 package com.modsen.poll_service.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -7,35 +8,55 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Map<Class<? extends Throwable>, ErrorMeta> ERROR_MAP = Map.ofEntries(
-            Map.entry(PollNotFoundException.class, new ErrorMeta("POLL_NOT_FOUND", HttpStatus.NOT_FOUND)),
-            Map.entry(OptionNotFoundException.class, new ErrorMeta("OPTION_NOT_FOUND", HttpStatus.NOT_FOUND)),
-            Map.entry(OptionMismatchException.class, new ErrorMeta("OPTION_MISMATCH", HttpStatus.BAD_REQUEST)),
-            Map.entry(UserAlreadyVotedException.class, new ErrorMeta("USER_ALREADY_VOTED", HttpStatus.CONFLICT)),
-            Map.entry(PollNotActiveException.class, new ErrorMeta("POLL_NOT_ACTIVE", HttpStatus.BAD_REQUEST))
-    );
-
-    @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ErrorDetails> handleAllExceptions(Throwable ex, WebRequest request) {
-        ErrorMeta meta = ERROR_MAP.getOrDefault(
-                ex.getClass(),
-                new ErrorMeta("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR)
-        );
-
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false),
-                meta.errorCode()
-        );
-
-        return new ResponseEntity<>(errorDetails, meta.status());
+    @ExceptionHandler(PollNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handlePollNotFoundException(PollNotFoundException ex, WebRequest request) {
+        log.warn("Poll not found: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getMessage(), request, "POLL_NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
-    private record ErrorMeta(String errorCode, HttpStatus status) {}
+    @ExceptionHandler(OptionNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleOptionNotFoundException(OptionNotFoundException ex, WebRequest request) {
+        log.warn("Option not found: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getMessage(), request, "OPTION_NOT_FOUND", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OptionMismatchException.class)
+    public ResponseEntity<ErrorDetails> handleOptionMismatchException(OptionMismatchException ex, WebRequest request) {
+        log.warn("Option mismatch: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getMessage(), request, "OPTION_MISMATCH", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyVotedException.class)
+    public ResponseEntity<ErrorDetails> handleUserAlreadyVotedException(UserAlreadyVotedException ex, WebRequest request) {
+        log.warn("User already voted: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getMessage(), request, "USER_ALREADY_VOTED", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PollNotActiveException.class)
+    public ResponseEntity<ErrorDetails> handlePollNotActiveException(PollNotActiveException ex, WebRequest request) {
+        log.warn("Poll not active: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getMessage(), request, "POLL_NOT_ACTIVE", HttpStatus.BAD_REQUEST);
+    }
+
+    // Универсальный хендлер для всех остальных исключений
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        return buildErrorResponse("Internal server error", request, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ErrorDetails> buildErrorResponse(String message, WebRequest request, String code, HttpStatus status) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                message,
+                request.getDescription(false),
+                code
+        );
+        return new ResponseEntity<>(errorDetails, status);
+    }
 }
